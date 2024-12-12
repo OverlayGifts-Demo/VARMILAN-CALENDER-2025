@@ -7,9 +7,8 @@
     <style>
         #playPauseButtonContainer {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            bottom: 20px;
+            right: 20px;
             z-index: 999;
         }
 
@@ -20,22 +19,25 @@
             z-index: 999;
         }
 
-        #playPauseButton img {
-            width: 60px;
-            height: 60px;
-            cursor: pointer;
-        }
-
+        #playPauseButton,
         #openWebsiteButton {
             padding: 10px 20px;
-            background-color: #1E90FF;
-            color: #fff;
             border-radius: 5px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             outline: none;
             border: none;
+        }
+
+        #playPauseButton {
+            background-color: #FFD700;
+            color: #000;
+        }
+
+        #openWebsiteButton {
+            background-color: #1E90FF;
+            color: #fff;
         }
 
         .a-enter-vr-button {
@@ -46,9 +48,7 @@
 <body>
     <!-- Play Button -->
     <div id="playPauseButtonContainer">
-        <div id="playPauseButton" disabled>
-            <img id="playPauseIcon" src="play1.png" alt="Play" />
-        </div>
+        <button id="playPauseButton" disabled>Play</button>
     </div>
 
     <!-- Open Website Button -->
@@ -80,44 +80,44 @@
     <script>
         const videoDisplay = document.querySelector('#videoDisplay');
         const playPauseButton = document.querySelector('#playPauseButton');
-        const playPauseIcon = document.querySelector('#playPauseIcon');
         const videoElement = document.querySelector('#demoVideo');
         const openWebsiteButton = document.querySelector('#openWebsiteButton');
 
-        let isPlaying = false;
-        let targetVisible = false;
+        let isPlaying = false; // State to track play/pause
+        let targetVisible = false; // State to track target visibility
 
+        // Event listener for the Play button
         playPauseButton.addEventListener('click', () => {
-            if (!targetVisible) return;
+            if (!targetVisible) return; // Prevent playing if target is not visible
             if (isPlaying) {
                 videoElement.pause();
-                playPauseIcon.src = 'play1.png';
-                playPauseIcon.alt = 'Play';
+                playPauseButton.textContent = 'Play';
             } else {
                 videoElement.play();
-                playPauseIcon.src = 'pause button.png';
-                playPauseIcon.alt = 'Pause';
+                playPauseButton.textContent = 'Pause';
             }
             isPlaying = !isPlaying;
         });
 
+        // Target found event
         const target = document.querySelector('#target1');
         target.addEventListener('targetFound', () => {
             targetVisible = true;
-            playPauseButton.style.pointerEvents = 'auto';
+            playPauseButton.disabled = false; // Enable the Play button
         });
 
+        // Target lost event
         target.addEventListener('targetLost', () => {
             targetVisible = false;
-            playPauseButton.style.pointerEvents = 'none';
-            videoElement.pause();
-            playPauseIcon.src = 'play1.png';
-            playPauseIcon.alt = 'Play';
-            isPlaying = false;
+            playPauseButton.disabled = true; // Disable the Play button
+            videoElement.pause(); // Pause the video when target is lost
+            playPauseButton.textContent = 'Play'; // Reset button text
+            isPlaying = false; // Reset state
         });
 
+        // Event listener for the Open Website button
         openWebsiteButton.addEventListener('click', () => {
-            window.open('https://shilpee2.odoo.com/', '_blank');
+            window.open('https://www.overlay-ai.com/', '_blank'); // Opens the URL in a new tab
         });
     </script>
 </body>
