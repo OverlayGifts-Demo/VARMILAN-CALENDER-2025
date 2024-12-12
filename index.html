@@ -19,8 +19,7 @@
             z-index: 999;
         }
 
-        #playPauseButton,
-        #openWebsiteButton {
+        #playPauseButton, #openWebsiteButton {
             padding: 10px 20px;
             border-radius: 5px;
             font-size: 16px;
@@ -46,78 +45,70 @@
     </style>
 </head>
 <body>
-    <!-- Play Button -->
     <div id="playPauseButtonContainer">
         <button id="playPauseButton" disabled>Play</button>
     </div>
 
-    <!-- Open Website Button -->
     <div id="openWebsiteButtonContainer">
         <button id="openWebsiteButton">Open Website</button>
     </div>
 
-    <!-- AR Scene -->
-    <a-scene
-        mindar-image="imageTargetSrc: ./targets.mind"
-        color-space="sRGB"
-        renderer="colorManagement: true, physicallyCorrectLights"
-        vr-mode-ui="enabled: false"
-        device-orientation-permission-ui="enabled: false">
-
+    <a-scene mindar-image="imageTargetSrc: ./targets.mind" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
         <a-assets>
-            <video id="demoVideo" src="vid1.mp4" playsinline></video>
+            <video id="demoVideo1" src="COLECTIVE 2025 calender.mp4" playsinline></video>
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-        <!-- Single Target -->
         <a-entity id="target1" mindar-image-target="targetIndex: 0">
-            <!-- Video Display -->
-            <a-plane id="videoDisplay" position="0 0 0" height="0.59" width="1" material="src: #demoVideo"></a-plane>
+            <a-plane id="videoDisplay1" position="0 0 0" height="0.59" width="1" material="src: #demoVideo1"></a-plane>
         </a-entity>
     </a-scene>
 
     <script>
-        const videoDisplay = document.querySelector('#videoDisplay');
         const playPauseButton = document.querySelector('#playPauseButton');
-        const videoElement = document.querySelector('#demoVideo');
         const openWebsiteButton = document.querySelector('#openWebsiteButton');
 
-        let isPlaying = false; // State to track play/pause
-        let targetVisible = false; // State to track target visibility
+        let isPlaying = false;
+        let targetVisible = false;
+        let currentVideo = document.querySelector('#demoVideo1');
 
-        // Event listener for the Play button
-        playPauseButton.addEventListener('click', () => {
-            if (!targetVisible) return; // Prevent playing if target is not visible
+        function togglePlayPause(videoElement, button) {
+            if (!targetVisible || !videoElement) return;
             if (isPlaying) {
                 videoElement.pause();
-                playPauseButton.textContent = 'Play';
+                button.textContent = 'Play';
             } else {
                 videoElement.play();
-                playPauseButton.textContent = 'Pause';
+                button.textContent = 'Pause';
             }
             isPlaying = !isPlaying;
+        }
+
+        playPauseButton.addEventListener('click', () => {
+            togglePlayPause(currentVideo, playPauseButton);
         });
 
-        // Target found event
-        const target = document.querySelector('#target1');
-        target.addEventListener('targetFound', () => {
+        function onTargetFound() {
             targetVisible = true;
-            playPauseButton.disabled = false; // Enable the Play button
-        });
+            playPauseButton.disabled = false;
+        }
 
-        // Target lost event
-        target.addEventListener('targetLost', () => {
+        function onTargetLost() {
             targetVisible = false;
-            playPauseButton.disabled = true; // Disable the Play button
-            videoElement.pause(); // Pause the video when target is lost
-            playPauseButton.textContent = 'Play'; // Reset button text
-            isPlaying = false; // Reset state
-        });
+            playPauseButton.disabled = true;
+            if (currentVideo) {
+                currentVideo.pause();
+                playPauseButton.textContent = 'Play';
+                isPlaying = false;
+            }
+        }
 
-        // Event listener for the Open Website button
+        document.querySelector('#target1').addEventListener('targetFound', onTargetFound);
+        document.querySelector('#target1').addEventListener('targetLost', onTargetLost);
+
         openWebsiteButton.addEventListener('click', () => {
-            window.open('https://www.overlay-ai.com/', '_blank'); // Opens the URL in a new tab
+            window.open('https://www.overlay-ai.com/', '_blank');
         });
     </script>
 </body>
