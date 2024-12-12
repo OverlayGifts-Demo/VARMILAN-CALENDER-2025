@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+        #playPauseButtonContainer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+        }
+
+        #openWebsiteButtonContainer {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 999;
+        }
+
+        #playPauseButton img {
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+        }
+
+        #openWebsiteButton {
+            padding: 10px 20px;
+            background-color: #1E90FF;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            border: none;
+        }
+
+        .a-enter-vr-button {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Play Button -->
+    <div id="playPauseButtonContainer">
+        <div id="playPauseButton" disabled>
+            <img id="playPauseIcon" src="play1.png" alt="Play" />
+        </div>
+    </div>
+
+    <!-- Open Website Button -->
+    <div id="openWebsiteButtonContainer">
+        <button id="openWebsiteButton">Open Website</button>
+    </div>
+
+    <!-- AR Scene -->
+    <a-scene
+        mindar-image="imageTargetSrc: ./targets.mind"
+        color-space="sRGB"
+        renderer="colorManagement: true, physicallyCorrectLights"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false">
+
+        <a-assets>
+            <video id="demoVideo" src="vid1.mp4" playsinline></video>
+        </a-assets>
+
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+        <!-- Single Target -->
+        <a-entity id="target1" mindar-image-target="targetIndex: 0">
+            <!-- Video Display -->
+            <a-plane id="videoDisplay" position="0 0 0" height="0.59" width="1" material="src: #demoVideo"></a-plane>
+        </a-entity>
+    </a-scene>
+
+    <script>
+        const videoDisplay = document.querySelector('#videoDisplay');
+        const playPauseButton = document.querySelector('#playPauseButton');
+        const playPauseIcon = document.querySelector('#playPauseIcon');
+        const videoElement = document.querySelector('#demoVideo');
+        const openWebsiteButton = document.querySelector('#openWebsiteButton');
+
+        let isPlaying = false;
+        let targetVisible = false;
+
+        playPauseButton.addEventListener('click', () => {
+            if (!targetVisible) return;
+            if (isPlaying) {
+                videoElement.pause();
+                playPauseIcon.src = 'play1.png';
+                playPauseIcon.alt = 'Play';
+            } else {
+                videoElement.play();
+                playPauseIcon.src = 'pause button.png';
+                playPauseIcon.alt = 'Pause';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        const target = document.querySelector('#target1');
+        target.addEventListener('targetFound', () => {
+            targetVisible = true;
+            playPauseButton.style.pointerEvents = 'auto';
+        });
+
+        target.addEventListener('targetLost', () => {
+            targetVisible = false;
+            playPauseButton.style.pointerEvents = 'none';
+            videoElement.pause();
+            playPauseIcon.src = 'play1.png';
+            playPauseIcon.alt = 'Play';
+            isPlaying = false;
+        });
+
+        openWebsiteButton.addEventListener('click', () => {
+            window.open('https://shilpee2.odoo.com/', '_blank');
+        });
+    </script>
+</body>
+</html>
